@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {
@@ -14,6 +14,17 @@ import Register from './components/register';
 
 function App() {
   let isUserLogged = false;
+  const [authenticated, setAuthenticated] = useState(false);
+
+  function requireAuth(nextState, replace, next) {
+    if (!authenticated) {
+      replace({
+        pathname: "/login",
+        state: { nextPathname: nextState.location.pathname }
+      });
+    }
+    next();
+  }
   return (
     <Router>
       <div>
@@ -27,11 +38,11 @@ function App() {
           <li>
             <Link to="/register">Register</Link>
           </li>
-         
+
           {/* <li>
             <Link to="/logout">Logout</Link>
           </li> */}
-          
+
         </ul>
 
         <hr />
@@ -44,7 +55,10 @@ function App() {
           of them to render at a time
         */}
         <Switch>
-          <Route exact path="/">
+          <Route exact path="/" render={requireAuth}>
+            <DashBoard />
+          </Route>
+          <Route exact path="/dashboard" render={requireAuth}>
             <DashBoard />
           </Route>
           <Route path="/login">

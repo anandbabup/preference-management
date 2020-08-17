@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useHistory } from 'react-router-dom';
+import  DataContext from './DataContext';
 
 import validateInput from './validation-rule';
 const options = [
@@ -8,21 +10,15 @@ const options = [
 ];
 
 export default function Register() {
-    const[accType,setAccType] = useState("");
+    const history = useHistory();
+    const [accType, setAccType] = useState("");
     const [error, setError] = useState({
         name: null,
         username: null,
-        password: null,
         email: null,
         contact: null,
         address: null,
-        regDate: null,
-        accType: null
     });
-
-    function validateAllInput() {
-
-    }
 
     function handleChange(event) {
         let err = validateInput(event.target);
@@ -36,9 +32,41 @@ export default function Register() {
     }
 
     function handleSubmit(event) {
-        const data = new FormData(event.target);
-        console.log(data);
+        if (isValidForm()) {
+            const accountNumber = getAutoGenAccNumber();
+            const customerId = getAutoGenCustomerId();
+            const data = new FormData(event.target);
+            data.append("accountnumber", accountNumber);
+            data.append("customerid", customerId);
+            DataContext.saveFormData(data);
+            alert("Registration Sucess")
+            history.push("/login");
+        }
         event.preventDefault();
+
+    }
+
+    function getAutoGenAccNumber(){
+        let randomNumber = Math.floor(Math.random()  * 900 + 100);
+        return `R-${randomNumber}`;
+    }
+
+    function getAutoGenCustomerId(){       
+        let randomNumber =  Math.floor(Math.random() * 10000000000000000)
+        return randomNumber;
+    }
+
+    function isValidForm() {
+        let isValid = true;
+        for (const key in error) {
+            if (isValid) {
+                const element = error[key];
+                if(element && element.state){
+                    isValid = element.state;
+                }
+            }
+        }
+        return isValid;
     }
 
     return (
@@ -94,7 +122,7 @@ export default function Register() {
                     <label htmlFor="address">Address</label>
                     <input type="text" name="address" className="form-control" onBlur={handleChange} id="address" required></input>
                 </div>
-                
+
                 <div className="form-group">
                     <label htmlFor="account">Account</label>
                     <select className="form-control" onChange={handleSelect} value={accType} name="accType" required>
@@ -104,7 +132,7 @@ export default function Register() {
                     </select>
                 </div>
 
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Submit</button><br/>
             </form>
         </div>
     );
