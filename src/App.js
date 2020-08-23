@@ -13,37 +13,44 @@ import Login from './components/login';
 import Register from './components/register';
 
 function App() {
-  let isUserLogged = false;
-  const [authenticated, setAuthenticated] = useState(false);
-
-  function requireAuth(nextState, replace, next) {
-    if (!authenticated) {
-      replace({
-        pathname: "/login",
-        state: { nextPathname: nextState.location.pathname }
-      });
-    }
-    next();
+  const [userInfo, setUserInfo] = useState({ isAuthenticated: false });
+  const setUser = function (user) {
+    setUserInfo(user);
   }
+
+  const logOut = () => {
+    setUserInfo({ isAuthenticated: false });
+  }
+
   return (
     <Router>
       <div>
         <ul>
           <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-          <li>
-            <Link to="/register">Register</Link>
+            <Link to="/">PMS</Link>
           </li>
 
-          {/* <li>
-            <Link to="/logout">Logout</Link>
-          </li> */}
+          {userInfo.isAuthenticated ?
+            <div style={{ float: "right", color: "white" }}>
+              <li >
+                <span>{userInfo.username}</span>
+              </li>
+              <li>
+                <Link onClick={logOut} >Logout</Link>
+              </li>
+            </div>
+            : <div>
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
+              <li>
+                <Link to="/register">Register</Link>
+              </li>
+            </div>}
 
         </ul>
+
+
 
         <hr />
 
@@ -55,14 +62,14 @@ function App() {
           of them to render at a time
         */}
         <Switch>
-          <Route exact path="/" render={requireAuth}>
-            <DashBoard />
+          <Route exact path="/" >
+            <DashBoard user={userInfo} />
           </Route>
-          <Route exact path="/dashboard" render={requireAuth}>
-            <DashBoard />
+          <Route exact path="/dashboard">
+            <DashBoard user={userInfo} />
           </Route>
           <Route path="/login">
-            <Login />
+            <Login setUser={setUser} />
           </Route>
           <Route path="/register">
             <Register />

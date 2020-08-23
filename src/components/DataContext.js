@@ -25,19 +25,16 @@ const DataContext = (function () {
         pmsId = `pms-${object.username}`;
         let user = localStorage.getItem(pmsId);
         let userInfo = JSON.parse(user);
-        if(userInfo.password === object.password){
+        if (userInfo.password === object.password) {
             loginStatus = true;
         }
-        return loginStatus;
+        return { isAuthenticated: loginStatus, username: userInfo.username };
     }
 
-    function getUser(formData) {
-        
-    }
 
     return {
         saveFormData,
-        login, getUser
+        login, 
 
     }
 })();

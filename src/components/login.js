@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import DataContext from './DataContext';
 import { useHistory } from 'react-router-dom';
-export default function Login() {
+export default function Login(props) {
     const history = useHistory();
     const [errorMsg, setErrorMsg] = useState();
     function handleSubmit(event) {
         const data = new FormData(event.target);
-        const status = DataContext.login(data);
-        if (status) {
+        const user = DataContext.login(data);
+        if (user.isAuthenticated) {
+            props.setUser(user);
             history.push("/dashboard");
         }
         setErrorMsg("Enter valid username/password");
@@ -26,7 +27,7 @@ export default function Login() {
                     <input type="password" name="password" className="form-control" id="password" aria-describedby="emailHelp" required></input>
                 </div>
 
-                <button type="submit" className="btn btn-primary">Submit</button><br/>
+                <button type="submit" className="btn btn-primary">Submit</button><br />
                 {errorMsg ?
                     <small id="error-name" className="text-danger">
                         {errorMsg}
